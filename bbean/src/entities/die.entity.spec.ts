@@ -1,7 +1,6 @@
-import { Die } from "./die.entity.js";
+import { Die } from './die.entity.js';
 
 describe('DieEntity', () => {
-
   let die: Die;
 
   beforeEach(() => {

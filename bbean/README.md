@@ -1,21 +1,23 @@
-# Die dev test 
+# Die dev test
 
 The approach:
 
 - Test driven first
-- Utilise an existing skeleton project 
+- Utilise an existing skeleton project
 - Write method names to assist with testing and logic
-- Show cased  Controllers, entities, service classes and a utility class
+- Show cased Controllers, entities, service classes and a utility class
 - Implemented KOA in the last few minutes to showcase request/response
 
 What went well:
+
 - Tests
 - Seperation of logic
 - KOA server
 - Met the majority of the spec
-- Showcasing the various aspects of node for none-node developers 
+- Showcasing the various aspects of node for none-node developers
 
 What didn't work well:
+
 - No time to do proper KOA request/response validation
 - Would have liked to have put it into docker
 - No CLI integration - however given more time I would use Google's https://github.com/google/zx

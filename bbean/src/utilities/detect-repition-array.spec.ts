@@ -1,4 +1,4 @@
-import returnMostCommonEntryInArray from "./detect-repetition-array.js";
+import returnMostCommonEntryInArray from './detect-repetition-array.js';
 
 describe('returnMostCommonEntryInArray', () => {
   it('should detect duplicate values in array', () => {

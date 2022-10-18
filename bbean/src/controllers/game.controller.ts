@@ -1,11 +1,10 @@
-import { Game } from "../services/game.js";
+import { Game } from '../services/game.js';
 
 export class GameController {
   private game: Game;
 
   constructor(private readonly name: string, numberOfDice: number) {
     this.game = new Game(numberOfDice);
-
   }
 
   public startGame(): Array<number> {

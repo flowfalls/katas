@@ -1,4 +1,4 @@
-import { GameController } from "./game.controller.js";
+import { GameController } from './game.controller.js';
 
 describe('GameController', () => {
   let gameController: GameController;
