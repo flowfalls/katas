@@ -7,39 +7,34 @@ package repositories
 
 import (
 	"context"
-	"database/sql"
-
-	"github.com/google/uuid"
 )
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (
-  id, name, gender, age, email, password, updated_at
+  name, gender, age, email, password, location
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7
+  $1, $2, $3, $4, $5, $6
 )
-RETURNING id, name, gender, age, email, password, created_at, updated_at
+RETURNING id, name, gender, age, email, password, created_at, updated_at, location
 `
 
 type CreateUserParams struct {
-	ID        uuid.UUID
-	Name      string
-	Gender    NullGender
-	Age       sql.NullInt16
-	Email     string
-	Password  string
-	UpdatedAt sql.NullTime
+	Name     string `json:"name"`
+	Gender   Gender `json:"gender"`
+	Age      int32  `json:"age"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Location int32  `json:"location"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, createUser,
-		arg.ID,
+	row := q.queryRow(ctx, q.createUserStmt, createUser,
 		arg.Name,
 		arg.Gender,
 		arg.Age,
 		arg.Email,
 		arg.Password,
-		arg.UpdatedAt,
+		arg.Location,
 	)
 	var i User
 	err := row.Scan(
@@ -51,6 +46,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Password,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Location,
 	)
 	return i, err
 }
@@ -60,18 +56,56 @@ DELETE FROM users
 WHERE id = $1
 `
 
-func (q *Queries) DeleteUser(ctx context.Context, id uuid.UUID) error {
-	_, err := q.db.ExecContext(ctx, deleteUser, id)
+func (q *Queries) DeleteUser(ctx context.Context, id int32) error {
+	_, err := q.exec(ctx, q.deleteUserStmt, deleteUser, id)
 	return err
 }
 
+const getPotentialMatches = `-- name: GetPotentialMatches :many
+select profiles.id, profiles.userid, profiles.bio, profiles.created_at, profiles.updated_at, profiles.picture from user_tags
+INNER JOIN profile_tags ON profile_tags.tag_id = user_tags.tag_id
+inner join profiles on profiles.id = profile_tags.profile_id
+left join swipe_history sh on (sh.triggering_user_id = user_tags.user_id and sh.profile_id = profiles.id)
+where user_tags.user_id = $1 and (sh.rejected is false or sh.rejected is null)
+`
+
+func (q *Queries) GetPotentialMatches(ctx context.Context, userID int32) ([]Profile, error) {
+	rows, err := q.query(ctx, q.getPotentialMatchesStmt, getPotentialMatches, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Profile
+	for rows.Next() {
+		var i Profile
+		if err := rows.Scan(
+			&i.ID,
+			&i.Userid,
+			&i.Bio,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Picture,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUser = `-- name: GetUser :one
-SELECT id, name, gender, age, email, password, created_at, updated_at FROM users
+SELECT id, name, gender, age, email, password, created_at, updated_at, location FROM users
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUser, id)
+func (q *Queries) GetUser(ctx context.Context, id int32) (User, error) {
+	row := q.queryRow(ctx, q.getUserStmt, getUser, id)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -82,17 +116,18 @@ func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.Password,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Location,
 	)
 	return i, err
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, name, gender, age, email, password, created_at, updated_at FROM users
+SELECT id, name, gender, age, email, password, created_at, updated_at, location FROM users
 ORDER BY name
 `
 
 func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
-	rows, err := q.db.QueryContext(ctx, listUsers)
+	rows, err := q.query(ctx, q.listUsersStmt, listUsers)
 	if err != nil {
 		return nil, err
 	}
@@ -109,6 +144,7 @@ func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
 			&i.Password,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.Location,
 		); err != nil {
 			return nil, err
 		}
@@ -121,4 +157,32 @@ func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const storeDecision = `-- name: StoreDecision :one
+INSERT INTO swipe_history (
+  triggering_user_id, profile_id, rejected
+) VALUES (
+  $1, $2, $3
+)
+RETURNING id, triggering_user_id, profile_id, rejected, created_at
+`
+
+type StoreDecisionParams struct {
+	TriggeringUserID int32 `json:"triggering_user_id"`
+	ProfileID        int32 `json:"profile_id"`
+	Rejected         bool  `json:"rejected"`
+}
+
+func (q *Queries) StoreDecision(ctx context.Context, arg StoreDecisionParams) (SwipeHistory, error) {
+	row := q.queryRow(ctx, q.storeDecisionStmt, storeDecision, arg.TriggeringUserID, arg.ProfileID, arg.Rejected)
+	var i SwipeHistory
+	err := row.Scan(
+		&i.ID,
+		&i.TriggeringUserID,
+		&i.ProfileID,
+		&i.Rejected,
+		&i.CreatedAt,
+	)
+	return i, err
 }

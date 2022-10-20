@@ -1,42 +1,54 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lb-dating/controllers"
+	"github.com/lb-dating/repositories"
+
+	_ "github.com/lib/pq"
 )
 
-func newDatingProfile(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Hello World"})
+var (
+	server  *gin.Engine
+	queries *repositories.Queries
+
+	UserController controllers.UserController
+	//UserRoutes     routes.UserRoutes
+)
+
+/**
+* Initialize the database connection
+ */
+func init() {
+	conn, err := sql.Open("postgres", "user=postgres dbname=postgres sslmode=disable")
+	if err != nil {
+		log.Fatalf("could not connect to postgres database: %v", err)
+	}
+
+	queries = repositories.New(conn)
+
+	fmt.Println("PostgreSQL connected successfully...")
+
+	server = gin.Default()
 }
 
 func main() {
-	router := gin.Default()
 
 	// Write an endpoint to create a random user at /user/create
-	router.POST("/user/create", newDatingProfile)
+	server.POST("/user", UserController.CreateUser)
+	server.GET("/user/:id/profiles", UserController.GetPotentialMatches)
+	server.POST("/user/:id/profiles/:profile_id/swipe", UserController.RespondToProfile)
 
-	// Write an endpoint to fetch profiles of potential matches at /profiles
-	// router.GET("/profiles", func(c *gin.Context) {
-	// 	gender := c.Query("gender")
-	// 	age := c.Query("lastname")
-	// 	distance := c.DefaultQuery("distance", "asc")
-	// 	c.JSON(http.StatusOK, gin.H{
-	// 		"message": "profiles fetched",
-	// 	})
-	// })
-
-	// Write an endpoint to respond to a profile at /swipe
-	// router.POST("/profiles/:profileId/swipe", func(c *gin.Context) {
-	// 	c.JSON(http.StatusOK, gin.H{
-	// 		"message": "swipe successful",
-	// 	})
-	// })
-
-	router.GET("/ping", func(c *gin.Context) {
+	server.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
 	})
-	router.Run()
+	// Listen and serve on
+	server.Run()
 }

@@ -9,8 +9,6 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type Gender string
@@ -56,44 +54,45 @@ func (ns NullGender) Value() (driver.Value, error) {
 }
 
 type Profile struct {
-	ID        uuid.UUID
-	Userid    uuid.NullUUID
-	Bio       sql.NullString
-	CreatedAt time.Time
-	UpdatedAt sql.NullTime
-	Picture   sql.NullString
+	ID        int32          `json:"id"`
+	Userid    sql.NullInt32  `json:"userid"`
+	Bio       sql.NullString `json:"bio"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt sql.NullTime   `json:"updated_at"`
+	Picture   sql.NullString `json:"picture"`
 }
 
 type ProfileTag struct {
-	ProfileID uuid.UUID
-	TagID     uuid.UUID
+	ProfileID int32 `json:"profile_id"`
+	TagID     int32 `json:"tag_id"`
 }
 
 type SwipeHistory struct {
-	ID               uuid.UUID
-	TriggeringUserID uuid.UUID
-	ReceivingUserID  uuid.UUID
-	Action           string
-	CreatedAt        time.Time
+	ID               int32     `json:"id"`
+	TriggeringUserID int32     `json:"triggering_user_id"`
+	ProfileID        int32     `json:"profile_id"`
+	Rejected         bool      `json:"rejected"`
+	CreatedAt        time.Time `json:"created_at"`
 }
 
 type Tag struct {
-	ID   uuid.UUID
-	Name string
+	ID   int32  `json:"id"`
+	Name string `json:"name"`
 }
 
 type User struct {
-	ID        uuid.UUID
-	Name      string
-	Gender    NullGender
-	Age       sql.NullInt16
-	Email     string
-	Password  string
-	CreatedAt time.Time
-	UpdatedAt sql.NullTime
+	ID        int32        `json:"id"`
+	Name      string       `json:"name"`
+	Gender    Gender       `json:"gender"`
+	Age       int32        `json:"age"`
+	Email     string       `json:"email"`
+	Password  string       `json:"password"`
+	CreatedAt time.Time    `json:"created_at"`
+	UpdatedAt sql.NullTime `json:"updated_at"`
+	Location  int32        `json:"location"`
 }
 
 type UserTag struct {
-	UserID uuid.UUID
-	TagID  uuid.UUID
+	UserID int32 `json:"user_id"`
+	TagID  int32 `json:"tag_id"`
 }
