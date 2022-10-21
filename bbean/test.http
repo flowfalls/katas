@@ -1,7 +1,0 @@
-POST http://localhost:3000/roll HTTP/1.1
-Content-Type: application/json
-
-{
-  "gameName": "John Doe's Game",
-  "numberOfDice": 5
-}
