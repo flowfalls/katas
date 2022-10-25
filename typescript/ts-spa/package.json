@@ -1,0 +1,36 @@
+{
+  "name": "frontend-interview-project",
+  "version": "1.0.0",
+  "description": "Interview project for Merapar frontend candidates",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "start": "npm run tsc:watch",
+    "build": "rimraf dist && tsc && rollup -c rollup.config.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "merapar",
+    "interview",
+    "frontend"
+  ],
+  "author": "Merapar",
+  "license": "ISC",
+  "devDependencies": {
+    "@rollup/plugin-json": "^5.0.1",
+    "@types/eventemitter3": "^2.0.2",
+    "@types/node": "^18.11.5",
+    "deepmerge": "^4.2.2",
+    "esbuild": "^0.15.12",
+    "eventemitter3": "^4.0.7",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.79.1",
+    "rollup-plugin-dts": "^4.2.3",
+    "rollup-plugin-esbuild": "^4.10.1",
+    "typescript": "^4.8.4"
+  },
+  "dependencies": {
+    "axios": "^1.1.3"
+  }
+}
