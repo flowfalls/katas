@@ -1,27 +1,36 @@
-import dts from 'rollup-plugin-dts'
-import esbuild from 'rollup-plugin-esbuild'
-import json from '@rollup/plugin-json'
+import dts from "rollup-plugin-dts";
+import esbuild from "rollup-plugin-esbuild";
+import json from "@rollup/plugin-json";
+import copy from 'rollup-plugin-copy'
 
-const name = require('./package.json').main.replace(/\.js$/, '')
+const name = require("./package.json").main.replace(/\.js$/, "");
 
-const bundle = config => ({
+const bundle = (config) => ({
   ...config,
-  input: 'src/index.ts',
-  external: id => !/^[./]/.test(id),
-})
+  input: "src/index.ts",
+  external: (id) => !/^[./]/.test(id),
+});
 
 export default [
   bundle({
-    plugins: [esbuild(), json()],
+    plugins: [
+      esbuild(),
+      json(),
+      copy({
+        targets: [
+          { src: 'src/style.css', dest: 'dist/styles' },
+        ]
+      })
+    ],
     output: [
       {
         file: `${name}.js`,
-        format: 'cjs',
+        format: "cjs",
         sourcemap: true,
       },
       {
         file: `${name}.mjs`,
-        format: 'es',
+        format: "es",
         sourcemap: true,
       },
     ],
@@ -30,7 +39,7 @@ export default [
     plugins: [dts()],
     output: {
       file: `${name}.d.ts`,
-      format: 'es',
+      format: "es",
     },
   }),
-]
+];
