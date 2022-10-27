@@ -17,3 +17,8 @@
     transform: rotate(360deg);
   }
 }
+
+.profile-image {
+  width: 100px;
+  border-radius: 300px;
+}

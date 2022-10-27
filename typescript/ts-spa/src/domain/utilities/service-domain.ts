@@ -3,8 +3,11 @@ export class ServiceDomain {
     console.log(request);
   }
 
-  getHtml(): string {
+  getDefaultHtml(): string {
     return "";
+  }
+
+  init(): void {
   }
 }
 

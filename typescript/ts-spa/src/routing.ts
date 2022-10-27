@@ -1,5 +1,5 @@
-import { services } from "./domains/domains";
-import { ServiceDomain } from "./domains/utilities/service-domain";
+import { services } from "./domain/domains";
+import { ServiceDomain } from "./domain/utilities/service-domain";
 import { Repository } from "./repository";
 
 type IndexedServiceDomain = {
@@ -42,16 +42,19 @@ export class Router {
       return;
     }
 
-    this.activeService = this._routeServices[requestedLink.replace('/', '')]; //or substring(1)
+    this.activeService = this._routeServices[requestedLink.replace('/', '')+'service']; //or substring(1)
 
-    // create a new instance, and call the getHtml method
-    const content = new this.activeService().getHtml();
-    console.log('content', content);
+    console.log(this.activeService);
+    // create a new instance, and call the getDefaultHtml method
+    const service = new this.activeService();
+    const content = service.getDefaultHtml();
+    console.log(content);
     //replace inner html
     const contentElement = document.getElementById("app");
     if(contentElement) {
       contentElement.innerHTML = content;
     }
+    service.init();
   }
 
 }
