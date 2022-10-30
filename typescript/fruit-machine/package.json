@@ -1,0 +1,69 @@
+{
+	"name": "fruit-machine",
+	"version": "0.0.0",
+	"license": "MIT",
+	"bin": "dist/cli.js",
+	"engines": {
+		"node": ">=10"
+	},
+	"scripts": {
+		"build": "tsc && chmod +x dist/cli.js",
+		"start": "clear && npm run build && dist/cli.js",
+		"pretest": "npm run build",
+		"test": "xo && ava"
+	},
+	"files": [
+		"dist/cli.js"
+	],
+	"dependencies": {
+		"@types/ink": "^2.0.3",
+		"@types/ink-big-text": "^1.2.1",
+		"@types/ink-gradient": "^2.0.1",
+		"immer": "^9.0.16",
+		"ink": "^3.2.0",
+		"ink-big-text": "^1.2.0",
+		"ink-box": "^1.0.0",
+		"ink-confirm-input": "^2.0.0",
+		"ink-gradient": "^2.0.0",
+		"ink-redux": "^1.0.0",
+		"ink-spinner": "^4.0.3",
+		"ink-table": "^3.0.0",
+		"ink-text-input": "^4.0.3",
+		"meow": "^9.0.0",
+		"react": "^16.8.2",
+		"react-redux": "^8.0.4"
+	},
+	"ava": {
+		"typescript": {
+			"extensions": [
+				"tsx"
+			],
+			"rewritePaths": {
+				"source/": "dist/"
+			}
+		}
+	},
+	"xo": {
+		"extends": "xo-react",
+		"rules": {
+			"react/prop-types": "off"
+		}
+	},
+	"devDependencies": {
+		"@ava/babel": "^2.0.0",
+		"@ava/typescript": "^3.0.1",
+		"@babel/preset-env": "^7.16.11",
+		"@babel/preset-react": "^7.16.7",
+		"@babel/register": "^7.17.7",
+		"@sindresorhus/tsconfig": "^3.0.1",
+		"@types/react": "^18.0.24",
+		"ava": "^5.0.1",
+		"chalk": "^4.1.2",
+		"eslint-config-xo-react": "^0.27.0",
+		"eslint-plugin-react": "^7.31.10",
+		"eslint-plugin-react-hooks": "^4.6.0",
+		"ink-testing-library": "^2.1.0",
+		"typescript": "^4.8.4",
+		"xo": "^0.39.1"
+	}
+}
