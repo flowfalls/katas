@@ -1,0 +1,41 @@
+{
+  "name": "typeorm-skel",
+  "version": "1.0.0",
+  "description": "Get started with TypeORM",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node src/index.ts",
+    "db:seed": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@faker-js/faker": "^7.6.0",
+    "commander": "^6.2.1",
+    "dotenv": "^8.2.0",
+    "lodash": "^4.17.20",
+    "pg": "^8.5.1",
+    "pg-query-stream": "^3.4",
+    "reflect-metadata": "^0.1.13",
+    "sql-template-strings": "^2.2.2",
+    "typeorm": "^0.2.29",
+    "typeorm-seeding": "^1.6.1",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@types/faker": "^6.6.9",
+    "@types/lodash": "^4.14.167",
+    "@types/node": "^12.19.12",
+    "@types/pg": "^7.14.7",
+    "@typescript-eslint/eslint-plugin": "^3.10.1",
+    "@typescript-eslint/parser": "^3.10.1",
+    "eslint": "^7.17.0",
+    "ts-node": "^9.1.1",
+    "typeorm-model-generator": "^0.4.4",
+    "typescript": "^4.1.3"
+  }
+}
